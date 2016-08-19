@@ -38,6 +38,10 @@ module Spree
       result
     end
 
+    def self.get(product_id)
+      Elasticsearch::Model::Response::Result.new(__elasticsearch__.client.get index: index_name, type: document_type, id: product_id)
+    end
+
     # Inner class used to query elasticsearch. The idea is that the query is dynamically build based on the parameters.
     class Product::ElasticsearchQuery
       include ::Virtus.model
@@ -121,6 +125,7 @@ module Spree
           query: { filtered: {} },
           sort: sorting,
           from: from,
+          size:  Spree::Config.products_per_page,
           facets: facets
         }
 

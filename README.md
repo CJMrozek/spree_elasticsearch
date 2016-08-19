@@ -13,17 +13,18 @@ To understand what is going on, you should first learn about Elasticsearch. Some
 Add spree_elasticsearch to your Gemfile:
 
 ```ruby
-gem 'spree_elasticsearch'
+gem 'spree_elasticsearch', github: 'javereec/spree_elasticsearch', branch: '3-0-stable'
 ```
 
 Bundle your dependencies and run the installation generator:
 
 ```shell
 bundle
+touch config/elasticsearch.yml # temporary install workaround
 bundle exec rails g spree_elasticsearch:install
 ```
 
-Edit/create the file in `config/elasticsearch.yml` to match your configuration.
+Edit the file in `config/elasticsearch.yml` to match your configuration.
 
 Edit the spree initializer in `config/initializers/spree.rb` and use the elasticsearch searcher.
 
@@ -33,14 +34,14 @@ Spree.config do |config|
 end
 ```
 
-Create a decorator for Product model to implement callbacks and update the index. Check the [elasticsearch-rails](https://github.com/elasticsearch/elasticsearch-rails/tree/master/elasticsearch-model#updating-the-documents-in-the-index) documentation for different options.
+Create a decorator for Product model to implement callbacks and update the index. This gem doesn't implement a default method as there are several options. For sites with lots of products and changes to these products, the recommended way would be to use a sidekiq task. Check the [elasticsearch-rails](https://github.com/elasticsearch/elasticsearch-rails/tree/master/elasticsearch-model#updating-the-documents-in-the-index) documentation for different options.
 
 For example using the model callbacks
 
 ```ruby
 module Spree
   Product.class_eval do
-    include Elasticsearch::Model::Callbacks  
+    include Elasticsearch::Model::Callbacks
   end
 end
 ```
@@ -84,4 +85,7 @@ Simply add this require statement to your spec_helper:
 require 'spree_elasticsearch/factories'
 ```
 
-Copyright (c) 2014 Jan Vereecken, released under the New BSD License
+Please note that these test require an actual instance of Elasticsearch. ]
+A helper product decorator class is includes to update the index when saving a product.
+
+Copyright (c) 2014-2015 Jan Vereecken, released under the New BSD License
